@@ -1,0 +1,93 @@
+# Dependencies
+node_modules/
+
+# Generated build and test output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+*.lcov
+
+# Emscripten and native compiler intermediates
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.bc
+*.map
+
+# Local caches and temporary files
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.turbo/
+.tmp/
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Logs and process state
+*.log
+logs/
+*.pid
+*.pid.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment and secret configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+.envrc
+.direnv/
+.npmrc
+.netrc
+credentials.json
+service-account*.json
+secrets/
+.secrets/
+
+# Private keys, signing material, and local certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.mobileprovision
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
+# Editor and IDE metadata
+.idea/
+.vscode/
+.fleet/
+*.iml
+*.code-workspace
+
+# Operating-system metadata
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Local archives and ad-hoc backups
+*.bak
+*.orig
+*.tar
+*.tar.gz
+*.tgz
+*.zip

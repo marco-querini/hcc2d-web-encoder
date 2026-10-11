@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7fb">
+  <meta name="description" content="Create QR, HCC2D4, and HCC2D8 codes privately in your browser with the open-source HCC2D WebAssembly encoder.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' blob:; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>HCC2D Web Encoder</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <script src="./assets/theme-bootstrap.js"></script>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#encoder-form" data-i18n="a11y.skip">Skip to encoder</a>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <a class="brand" href="./" aria-label="HCC2D Web Encoder home" data-i18n-aria-label="a11y.home">
+        <span class="mode-icon mode-four" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-copy">
+          <strong>HCC2D</strong>
+          <span>Web Encoder</span>
+        </span>
+      </a>
+
+      <div class="header-actions">
+        <div class="privacy-badge">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10V7a4 4 0 1 1 8 0v3m-9 0h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z"/></svg>
+          <span data-i18n="header.private">Private by design</span>
+        </div>
+        <label class="language-control" aria-label="Language" data-i18n-aria-label="a11y.language">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.2 2.5 3.3 5.5 3.3 9S14.2 18.5 12 21c-2.2-2.5-3.3-5.5-3.3-9S9.8 5.5 12 3Z"/></svg>
+          <select id="language-select">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="it">Italiano</option>
+            <option value="ja">日本語</option>
+            <option value="zh-hans">简体中文</option>
+          </select>
+        </label>
+        <label class="theme-control" aria-label="Colour theme" data-i18n-aria-label="a11y.theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42M7.06 16.94l-1.42 1.42M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+          <select id="theme-select">
+            <option value="system" data-i18n="theme.system">System</option>
+            <option value="light" data-i18n="theme.light">Light</option>
+            <option value="dark" data-i18n="theme.dark">Dark</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow"><span class="status-dot"></span><span id="engine-status">Loading encoder</span></p>
+        <h1 id="page-title" data-i18n="hero.line1">Create HCC2D and QR codes</h1>
+        <p class="intro-copy" data-i18n="hero.copy">A fast, open-source HCC2D encoder that runs entirely on your device. No upload, no account, no tracking.</p>
+      </div>
+      <div class="trust-note">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+        <div><strong data-i18n="hero.trustTitle">100% client-side</strong><span data-i18n="hero.trustCopy">Your content never leaves this browser.</span></div>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <form id="encoder-form" class="control-panel" novalidate>
+        <section class="panel-section source-section" aria-labelledby="source-heading">
+          <div class="section-heading">
+            <span class="step-number">01</span>
+            <div><h2 id="source-heading" data-i18n="source.title">Add your content</h2><p data-i18n="source.copy">Choose what the symbol should contain.</p></div>
+          </div>
+
+          <div class="tab-list" role="tablist" aria-label="Content type" data-i18n-aria-label="a11y.contentType">
+            <button id="tab-text" type="button" class="tab-button active" role="tab" aria-selected="true" aria-controls="source-text" data-source-tab="text">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg><span data-i18n="source.textTab">Text</span>
+            </button>
+            <button id="tab-file" type="button" class="tab-button" role="tab" aria-selected="false" aria-controls="source-file" data-source-tab="file">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7V3Zm7 0v5h4"/></svg><span data-i18n="source.fileTab">File</span>
+            </button>
+            <button id="tab-url" type="button" class="tab-button" role="tab" aria-selected="false" aria-controls="source-url" data-source-tab="url">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1m2 3a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1"/></svg><span data-i18n="source.urlTab">URL</span>
+            </button>
+            <button id="tab-vcard" type="button" class="tab-button" role="tab" aria-selected="false" aria-controls="source-vcard" data-source-tab="vcard">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4V5Zm4 9c.7-1.2 1.7-2 3-2s2.3.8 3 2M11 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm5-1h2m-2 3h2m-2 3h2"/></svg><span data-i18n="source.vcardTab">vCard</span>
+            </button>
+          </div>
+
+          <div id="source-text" class="tab-panel active" role="tabpanel" aria-labelledby="tab-text" data-source-panel="text">
+            <label class="field-label" for="text-input" data-i18n="source.textLabel">Text content</label>
+            <div class="textarea-wrap">
+              <textarea id="text-input" rows="6" placeholder="Type or paste your content here…" data-i18n-placeholder="source.textPlaceholder">Welcome to the HCC2D Web Encoder!</textarea>
+              <span id="text-counter" class="input-counter">16 B</span>
+            </div>
+          </div>
+
+          <div id="source-file" class="tab-panel" role="tabpanel" aria-labelledby="tab-file" data-source-panel="file" hidden>
+            <label id="file-dropzone" class="file-dropzone">
+              <input id="file-input" type="file">
+              <span class="upload-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M5 15v4h14v-4"/></svg></span>
+              <strong id="file-title">Drop a file here or browse</strong>
+              <span id="file-detail">Up to 64 KB before optional compression</span>
+            </label>
+          </div>
+
+          <div id="source-url" class="tab-panel" role="tabpanel" aria-labelledby="tab-url" data-source-panel="url" hidden>
+            <label class="field-label" for="url-input" data-i18n="source.urlLabel">Web address</label>
+            <input id="url-input" type="url" inputmode="url" placeholder="https://example.com" data-i18n-placeholder="source.urlPlaceholder">
+          </div>
+
+          <div id="source-vcard" class="tab-panel" role="tabpanel" aria-labelledby="tab-vcard" data-source-panel="vcard" hidden>
+            <div class="field-grid two-columns">
+              <label><span class="field-label" data-i18n="vcard.first">First name</span><input id="vcard-first-name" type="text" autocomplete="given-name" placeholder="Ada"></label>
+              <label><span class="field-label" data-i18n="vcard.last">Last name</span><input id="vcard-last-name" type="text" autocomplete="family-name" placeholder="Lovelace"></label>
+              <label><span class="field-label" data-i18n="vcard.phone">Phone</span><input id="vcard-phone" type="tel" autocomplete="tel" placeholder="+39 000 000 0000"></label>
+              <label><span class="field-label" data-i18n="vcard.email">Email</span><input id="vcard-email" type="email" autocomplete="email" placeholder="name@example.com"></label>
+              <label class="span-two"><span class="field-label" data-i18n="vcard.organization">Organisation</span><input id="vcard-organization" type="text" autocomplete="organization" placeholder="Organisation name" data-i18n-placeholder="vcard.organizationPlaceholder"></label>
+              <label class="span-two"><span class="field-label" data-i18n="vcard.website">Website</span><input id="vcard-url" type="url" inputmode="url" placeholder="https://example.com" data-i18n-placeholder="source.urlPlaceholder"></label>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section" aria-labelledby="format-heading">
+          <div class="section-heading">
+            <span class="step-number">02</span>
+            <div><h2 id="format-heading" data-i18n="format.title">Choose a format</h2><p data-i18n="format.copy">Balance compatibility and colour capacity.</p></div>
+          </div>
+
+          <div class="mode-grid" role="radiogroup" aria-label="Symbol format" data-i18n-aria-label="a11y.symbolFormat">
+            <label class="mode-card">
+              <input type="radio" name="mode" value="qr">
+              <span class="mode-icon mode-qr" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span><strong>QR Code</strong><small data-i18n="format.qrCopy">2 colours · universal</small></span>
+              <span class="radio-mark"></span>
+            </label>
+            <label class="mode-card selected">
+              <input type="radio" name="mode" value="hcc2d4" checked>
+              <span class="mode-icon mode-four" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              <span><strong>HCC2D4</strong><small data-i18n="format.hcc2d4Copy">4 colours · 2 bits/module</small></span>
+              <span class="radio-mark"></span>
+            </label>
+            <label class="mode-card">
+              <input type="radio" name="mode" value="hcc2d8">
+              <span class="mode-icon mode-eight" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span><strong>HCC2D8</strong><small data-i18n="format.hcc2d8Copy">8 colours · 3 bits/module</small></span>
+              <span class="radio-mark"></span>
+            </label>
+          </div>
+
+          <div class="field-grid settings-grid">
+            <label><span class="field-label" data-i18n="settings.ec">Error correction</span><select id="ec-level"><option value="L" data-i18n="settings.ecL">L · Maximum capacity</option><option value="M" data-i18n="settings.ecM">M · Balanced</option><option value="Q" selected data-i18n="settings.ecQ">Q · More resilient</option><option value="H" data-i18n="settings.ecH">H · Maximum resilience</option></select></label>
+            <label><span class="field-label" data-i18n="settings.payload">Payload format</span><select id="payload-format"><option value="auto" selected data-i18n="settings.automatic">Automatic</option><option value="raw" data-i18n="settings.raw">Raw bytes</option><option value="hcc2df" data-i18n="settings.hcc2df">HCC2DF container</option></select></label>
+          </div>
+        </section>
+
+        <section id="palette-section" class="panel-section palette-section" aria-labelledby="palette-heading">
+          <div class="section-heading section-heading-action">
+            <span class="step-number">03</span>
+            <div><h2 id="palette-heading" data-i18n="palette.title">Palette</h2><p data-i18n="palette.copy">Define how your colour code looks.</p></div>
+            <span id="palette-validity" class="validity-badge valid"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10 3 3 7-7"/></svg><span data-i18n="palette.valid">Valid</span></span>
+          </div>
+
+          <div class="palette-presets" role="radiogroup" aria-label="Colour palette" data-i18n-aria-label="a11y.palette">
+            <label class="preset-pill"><input type="radio" name="palette" value="model1"><span>Model 1</span></label>
+            <label class="preset-pill"><input type="radio" name="palette" value="model2"><span>Model 2</span></label>
+            <label class="preset-pill"><input type="radio" name="palette" value="custom" checked><span data-i18n="palette.custom">Custom</span></label>
+          </div>
+
+          <div id="custom-palette" class="palette-editor">
+            <div class="palette-strip" role="img" aria-label="Current four-colour palette" data-i18n-aria-label="a11y.currentPalette">
+              <span class="black-swatch"><small data-i18n="palette.fixed">Fixed</small><strong>#000000</strong></span>
+              <span id="strip-color-one"><small data-i18n="palette.colourOne">Colour 1</small><strong>#DC0000</strong></span>
+              <span id="strip-color-two"><small data-i18n="palette.colourTwo">Colour 2</small><strong>#00C8DC</strong></span>
+              <span class="light-swatch"><small data-i18n="palette.fixed">Fixed</small><strong>#FFFFFF</strong></span>
+            </div>
+            <div class="colour-controls">
+              <div class="colour-field">
+                <span class="field-label" data-i18n="palette.intermediateOne">Intermediate colour 1</span>
+                <span class="colour-input-wrap"><input id="palette-color-one" type="color" value="#dc0000" aria-label="Intermediate colour 1 picker" data-i18n-aria-label="a11y.colorOne"><input id="palette-hex-one" class="hex-input" type="text" value="#DC0000" maxlength="7" spellcheck="false" aria-label="Intermediate colour 1 hexadecimal value" data-i18n-aria-label="a11y.colorOneHex"></span>
+              </div>
+              <div class="colour-field">
+                <span class="field-label" data-i18n="palette.intermediateTwo">Intermediate colour 2</span>
+                <span class="colour-input-wrap"><input id="palette-color-two" type="color" value="#00c8dc" aria-label="Intermediate colour 2 picker" data-i18n-aria-label="a11y.colorTwo"><input id="palette-hex-two" class="hex-input" type="text" value="#00C8DC" maxlength="7" spellcheck="false" aria-label="Intermediate colour 2 hexadecimal value" data-i18n-aria-label="a11y.colorTwoHex"></span>
+              </div>
+            </div>
+            <div id="palette-distance" class="distance-meter">
+              <span><i id="distance-fill"></i></span>
+              <div><strong data-i18n="palette.separation">Colour separation</strong><small id="distance-copy">Safe for encoding</small></div>
+              <b id="distance-value">—</b>
+            </div>
+          </div>
+          <p id="fixed-palette-note" class="inline-note" hidden data-i18n="palette.fixedNote">The selected palette follows the HCC2D 0.9.0 reference encoder.</p>
+        </section>
+
+        <details class="advanced-panel">
+          <summary><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10m4 0h2M4 17h2m4 0h10M14 4v6M6 14v6"/></svg><span data-i18n="advanced.title">Advanced settings</span></span><svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></summary>
+          <div class="advanced-content">
+            <label class="toggle-row"><span><strong data-i18n="advanced.autoVersion">Automatic version</strong><small data-i18n="advanced.autoCopy">Use the smallest symbol that fits.</small></span><input id="auto-version" type="checkbox" checked><i aria-hidden="true"></i></label>
+            <div class="field-grid three-columns">
+              <label><span class="field-label" data-i18n="advanced.version">Forced version</span><input id="version" type="number" min="1" max="40" value="1" disabled></label>
+              <label><span class="field-label" data-i18n="advanced.scale">Pixel scale</span><input id="scale" type="number" min="6" max="64" value="12"></label>
+              <label><span class="field-label" data-i18n="advanced.quiet">Quiet zone</span><input id="quiet-zone" type="number" min="0" max="64" value="4"></label>
+            </div>
+          </div>
+        </details>
+
+        <div id="form-error" class="form-message error" role="alert" hidden></div>
+        <button id="generate-button" class="primary-button" type="submit" disabled>
+          <span class="button-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm11 0h2v2h-2v-2Zm3 0h2v5h-5v-2h3v-3Zm-4 5h2v2h-2v-2Z"/></svg><span data-i18n="action.generate">Generate code</span></span>
+          <span class="button-loading"><i></i><span data-i18n="action.encoding">Encoding locally…</span></span>
+        </button>
+      </form>
+
+      <aside class="preview-column" aria-label="Generated code preview" data-i18n-aria-label="a11y.preview">
+        <div class="preview-panel">
+          <div class="preview-header">
+            <div><p class="panel-kicker" data-i18n="preview.localOutput">Local output</p><h2 data-i18n="preview.title">Preview</h2></div>
+            <span id="preview-state" class="preview-state waiting"><i></i><span data-i18n="preview.waiting">Waiting</span></span>
+          </div>
+
+          <div id="preview-stage" class="preview-stage empty">
+            <div id="preview-placeholder" class="preview-placeholder">
+              <div class="placeholder-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <strong data-i18n="preview.placeholderTitle">Your code will appear here</strong>
+              <span data-i18n="preview.placeholderCopy">Configure the options and select Generate.</span>
+            </div>
+            <img id="preview-image" src="./assets/favicon.svg" alt="Generated HCC2D code" data-i18n-alt="a11y.previewImage" hidden>
+          </div>
+
+          <div id="result-details" class="result-details" aria-live="polite">
+            <div><span data-i18n="preview.format">Format</span><strong id="result-format">HCC2D4</strong></div>
+            <div><span data-i18n="preview.version">Version</span><strong id="result-version">Auto</strong></div>
+            <div><span data-i18n="preview.dimensions">Dimensions</span><strong id="result-dimensions">—</strong></div>
+            <div><span data-i18n="preview.output">Output</span><strong id="result-size">—</strong></div>
+          </div>
+
+          <div class="download-area">
+            <label><span class="field-label" data-i18n="preview.filename">Filename</span><input id="output-filename" type="text" value="hcc2d-code.png" spellcheck="false"></label>
+            <a id="download-button" class="download-button disabled" aria-disabled="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+              <span data-i18n="preview.download">Download PNG</span>
+            </a>
+          </div>
+
+          <div class="local-processing-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10V7a4 4 0 1 1 8 0v3m-9 0h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z"/></svg>
+            <span><strong data-i18n="preview.localTitle">Processed locally with WebAssembly</strong><span data-i18n="preview.localCopy">No content is uploaded or stored.</span></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div><strong>HCC2D Web Encoder 0.9.0</strong><span>Apache License 2.0</span></div>
+    <nav aria-label="Project links"><a id="specification-link" href="https://doi.org/10.5281/zenodo.22206528" target="_blank" rel="noreferrer" data-i18n="footer.specification">HCC2D Specification</a><a id="website-link" href="https://hcc2d.com/en/" target="_blank" rel="noreferrer" data-i18n="footer.website">hcc2d.com</a></nav>
+  </footer>
+
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>
